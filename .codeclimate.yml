@@ -1,0 +1,14 @@
+---
+engines:
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - python
+    exclude_paths:
+      - "level-up-35-solutions/tests/*.py"
+      - "level-up-35-solutions/src/*.py"
+ratings:
+  paths:
+  - "**.py"
+
