@@ -1,4 +1,6 @@
 """User class"""
+
+
 class User:
     """Instance variable for log in status"""
     logged_in = False
