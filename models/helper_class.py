@@ -71,3 +71,4 @@ class Helper:
             if user.logged_in:
                 return vars(user)
         return False
+

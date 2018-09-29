@@ -29,6 +29,10 @@ class UserTest(unittest.TestCase):
         wrong = self.helper.check_password('som98')
         self.assertEqual(wrong, 'Password has no capital letter.')
 
+    def test_check_password_no_lowercase(self):
+        wrong = self.helper.check_password('SOM98')
+        self.assertEqual(wrong, 'Password has no lowercase letter.')
+
     def test_check_password_no_symbol(self):
         wrong = self.helper.check_password('s98A')
         self.assertEqual(wrong, 'Password has no special character.')
@@ -81,3 +85,49 @@ class UserTest(unittest.TestCase):
     def test_valid_email_valid_password(self):
         valid = self.helper.register_user('Jack', 'someJack', 'some@mail.com', 'Abcd8^', 1)
         self.assertTrue(valid)
+
+    def test_register_user_entry_is_in_db(self):
+        valid = self.helper.register_user('Jack', 'someJack', 'some@mail.com', 'Abcd8^', 1)
+        self.assertNotEqual(len(self.helper.user_db), 0)
+
+    def test_login_user_invalid(self):
+        self.helper.register_user('Jack', 'someJack', 'some@mail.com', 'Abcd8^', 1)
+        invalid = self.helper.login_user('some@mail.com', 'Abcd8')
+        invalid_2 = self.helper.login_user('somemail.com', 'Abcd8^')
+        self.assertFalse(invalid)
+        self.assertFalse(invalid_2)
+
+    def test_login_user_valid(self):
+        self.helper.register_user('Jack', 'someJack', 'some@mail.com', 'Abcd8^', 1)
+        valid = self.helper.login_user('some@mail.com', 'Abcd8^')
+        self.assertTrue(valid)
+        if valid:
+            for user in self.helper.user_db:
+                self.assertEqual(user.logged_in, True)
+
+    def test_reset_password_success(self):
+        self.helper.register_user('Jack', 'someJack', 'some@mail.com', 'Abcd8^', 1)
+        self.helper.login_user('some@mail.com', 'Abcd8^')
+        for user in self.helper.user_db:
+            old_password = user.password
+            self.helper.reset_password('Abcd8*')
+            self.assertNotEqual(old_password, user.password)
+
+    def test_reset_password_fail(self):
+        self.helper.register_user('Jack', 'someJack', 'some@mail.com', 'Abcd8^', 1)
+        for user in self.helper.user_db:
+            self.helper.reset_password('Abcd8*')
+            self.assertNotEqual('Abcd8*', user.password)
+
+    def test_return_info_success(self):
+        self.helper.register_user('Jack', 'someJack', 'some@mail.com', 'Abcd8^', 1)
+        self.helper.login_user('some@mail.com', 'Abcd8^')
+        for user in self.helper.user_db:
+            user_info = self.helper.return_info()
+            self.assertIsInstance(user_info, dict)
+
+    def test_return_info_fail(self):
+        self.helper.register_user('Jack', 'someJack', 'some@mail.com', 'Abcd8^', 1)
+        for user in self.helper.user_db:
+            user_info = self.helper.return_info()
+            self.assertFalse(user_info)
